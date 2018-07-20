@@ -1,2 +1,11 @@
 # webgl-slicer
-Variable angle WebGL slicer for DLP 3D printers
+
+## Production build
+* `npm install`
+* `npm run build`
+
+## Development
+* `npm install`
+* `npm start` (runs `webpack-serve` to auto-update upon changes)
+* open browser to `localhost:8080`
+

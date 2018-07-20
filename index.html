@@ -1,0 +1,106 @@
+<!doctype html>
+<html class="no-js" lang="">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <title></title>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <link rel="manifest" href="site.webmanifest">
+  <!-- Place favicon.ico in the root directory -->
+
+  <link rel="stylesheet" href="css/normalize.css">
+  <link rel="stylesheet" href="css/main.css">
+</head>
+
+<body>
+  <!--[if lte IE 9]>
+    <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
+  <![endif]-->
+
+  <!-- Add your site or application content here -->
+  <div class="flex-main-container fullscreen justify">
+      <div class="flex-column">
+          <div class="program-info">
+              <h1>WebGL Slicer</h1>
+
+              <h2>File</h2>
+              <div class="vertical-padding">
+                  <input id="file_upload" type="file"/>
+              </div>
+              <div class="flex-row justify vertical-padding">
+                  <button id="rotate_x_button" class="big-button">Rotate X</button>
+                  <button id="rotate_y_button" class="big-button">Rotate Y</button>
+                  <button id="rotate_z_button" class="big-button">Rotate Z</button>
+              </div>
+              <div class="vertical-padding">
+                  <button id="center_button" class="big-button">Auto center</button>
+              </div>
+
+
+              <h2>Settings</h2>
+              <div class="flex-row justify">
+                  <div>Printer X pixels</div>
+                  <input id="printer_pixels_x" type="text" size="4"/>
+              </div>
+              <div class="flex-row justify">
+                  <div>Printer Y pixels</div>
+                  <input id="printer_pixels_y" type="text" size="4"/>
+              </div>
+              <div class="flex-row justify">
+                  <div>Printer X physical size</div>
+                  <input id="printer_size_x" type="text" size="4"/>
+              </div>
+              <div class="flex-row justify">
+                  <div>Printer Y physical size</div>
+                  <input id="printer_size_y" type="text" size="4"/>
+              </div>
+
+              <div class="vertical-padding"></div>
+              <div>Slice plane angle</div>
+              <input id="slice_plane_angle" class="big-button" type="range" min="0.0" max="1.5708" step="0.2618" value="0.0"/>
+              <div class="flex-row justify">
+                  <div>Printer slice thickness</div>
+                  <input id="printer_slice_thickness" type="text" size="4"/>
+              </div>
+              <div class="flex-row justify">
+                  <div>Printer slice subsampling</div>
+                  <input id="printer_slice_subsampling" type="text" size="4"/>
+              </div>
+
+              <div class="vertical-padding"></div>
+              <button id="printer_settings_button" class="big-button">Update</button>
+
+
+              <h2>Slice</h2>
+              <div id="slice_number">Slice 0</div>
+              <input id="slice_slider" class="big-button" type="range" min="0" max="1" step="0.001" value="0.5"/>
+              <div id="slice_info" class="vertical-padding">0 slices total</div>
+
+              <div class="vertical-padding"></div>
+              <button id="download_button" class="big-button">Download</button>
+          </div>
+      </div>
+
+      <div class="flex-column big">
+          <div class="flex-row">
+              <div class="webgl-info" id="webgl_version">Loading...</div>
+              <div class="webgl-info">&nbsp;</div>
+              <div class="webgl-info" id="webgl_fps">[0 fps]</div>
+          </div>
+          <canvas id="render_canvas"></canvas>
+      </div>
+
+      <div class="flex-column big">
+          <div class="webgl-info">Slice render preview</div>
+          <canvas id="slice_canvas"></canvas>
+      </div>
+  </div>
+
+  <script src="bundle.js"></script>
+
+</body>
+
+</html>
