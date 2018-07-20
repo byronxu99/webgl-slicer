@@ -1,5 +1,8 @@
 # webgl-slicer
 
+## Online usage
+Visit https://byronxu99.github.io/webgl-slicer/ to use it online!
+
 ## Production build
 * `npm install`
 * `npm run build`

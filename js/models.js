@@ -85,6 +85,9 @@ function loadModel(model) {
 function getModelData() {
     if(!modelData) {
         loadModel(data.F);
+        rotateModel('x');
+        rotateModel('x');
+        centerModel();
     }
 
     return modelData;
@@ -95,25 +98,7 @@ function getModelBounds() {
 }
 
 // a matrix that positions the model in world-space
-let lastTime = 0;
-let rotations = [0,0,0];
 function getModelMatrix(time) {
-    // get time change
-    const deltaTime = 0.001 * (time - lastTime);
-    const scale = 0.2;
-    lastTime = time;
-
-    // compute animation
-    rotations[0] = (rotations[0] + scale*0*deltaTime) % 360;
-    rotations[1] = (rotations[1] + scale*90*deltaTime) % 360;
-    rotations[2] = (rotations[2] + scale*0*deltaTime) % 360;
-
-    const t = m4.translation([-50, -75, -15]);
-    const rx = m4.rotationX(degToRad(rotations[0]));
-    const ry = m4.rotationY(degToRad(rotations[1]));
-    const rz = m4.rotationZ(degToRad(rotations[2]));
-
-    //return composeTransformations(modelMatrix, rx, ry, rz);
     return modelMatrix;
 }
 
