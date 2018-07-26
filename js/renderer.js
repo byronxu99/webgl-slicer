@@ -107,7 +107,7 @@ function update() {
     if(offscreen.depthstencil) gl.deleteRenderbuffer(offscreen.depthstencil);
     offscreen.depthstencil = gl.createRenderbuffer();
     gl.bindRenderbuffer(gl.RENDERBUFFER, offscreen.depthstencil);
-    gl.renderbufferStorageMultisample(gl.RENDERBUFFER, settings.offscreenMultisampling, gl.DEPTH_STENCIL, settings.printerPixelsX, settings.printerPixelsY);
+    gl.renderbufferStorageMultisample(gl.RENDERBUFFER, settings.offscreenMultisampling, gl.DEPTH24_STENCIL8, settings.printerPixelsX, settings.printerPixelsY);
     gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_STENCIL_ATTACHMENT, gl.RENDERBUFFER, offscreen.depthstencil);
 
     // bind and set size of the offscreen copy framebuffer
