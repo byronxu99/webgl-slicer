@@ -163,7 +163,7 @@ async function asyncRenderAndDownload() {
         const blob = await new Promise((resolve, reject) => {
             canvas.toBlob(resolve);
         });
-        const filename = `slices/${sliceNumber}.png`; 
+        const filename = `slices/${sliceNumber}.png`;
 
         zip.file(filename, blob);
         sliceNumber += 1;
