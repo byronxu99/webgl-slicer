@@ -29,22 +29,43 @@ function loadParsedSTL(stl) {
         a_color:    { numComponents: 4, data: new Uint8Array(4 * numVertices).fill(255) },
     };
 
-    // loop over triangles
-    for(let i = 0; i < numTriangles; i++) {
-        // each normal is shared by 3 vertices
-        const [nx, ny, nz] = stl.faceNormals[i];
+    // if normals exist for each vertex
+    if(stl.vertexNormals) {
+        // loop over triangles
+        for(let i = 0; i < numTriangles; i++) {
+            // loop over the 3 vertices of each triangle
+            for(let v = 0; v < 3; v++) {
+                const [x, y, z] = stl.positions[stl.cells[i][v]];
+                const [nx, ny, nz] = stl.vertexNormals[stl.cells[i][v]];
 
-        // loop over the 3 vertices of each triangle
-        for(let v = 0; v < 3; v++) {
-            const [x, y, z] = stl.positions[3*i + v];
+                // write data to Float32Array's
+                model.a_position.data[9*i + 3*v + 0] = x;
+                model.a_position.data[9*i + 3*v + 1] = y;
+                model.a_position.data[9*i + 3*v + 2] = z;
+                model.a_normal.data[9*i + 3*v + 0] = nx;
+                model.a_normal.data[9*i + 3*v + 1] = ny;
+                model.a_normal.data[9*i + 3*v + 2] = nz;
+            }
+        }
+    }
+    // no vertex normals, copy face normal for each vertex
+    else {
+        // loop over triangles
+        for(let i = 0; i < numTriangles; i++) {
+            // each normal is shared by 3 vertices
+            const [nx, ny, nz] = stl.faceNormals[i];
+            // loop over the 3 vertices of each triangle
+            for(let v = 0; v < 3; v++) {
+                const [x, y, z] = stl.positions[stl.cells[i][v]];
 
-            // write data to Float32Array's
-            model.a_position.data[9*i + 3*v + 0] = x;
-            model.a_position.data[9*i + 3*v + 1] = y;
-            model.a_position.data[9*i + 3*v + 2] = z;
-            model.a_normal.data[9*i + 3*v + 0] = nx;
-            model.a_normal.data[9*i + 3*v + 1] = ny;
-            model.a_normal.data[9*i + 3*v + 2] = nz;
+                // write data to Float32Array's
+                model.a_position.data[9*i + 3*v + 0] = x;
+                model.a_position.data[9*i + 3*v + 1] = y;
+                model.a_position.data[9*i + 3*v + 2] = z;
+                model.a_normal.data[9*i + 3*v + 0] = nx;
+                model.a_normal.data[9*i + 3*v + 1] = ny;
+                model.a_normal.data[9*i + 3*v + 2] = nz;
+            }
         }
     }
 
@@ -59,6 +80,7 @@ function loadModel(model) {
 
     // set global data
     modelData = model;
+    modelMatrix = m4.identity();
 
     // find bounds
     let bounds = {

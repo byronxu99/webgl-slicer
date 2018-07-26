@@ -120,7 +120,7 @@ body {
 }
 
 /* use vertical layout on small screens */
-@media all and (max-width: 1200px) {
+@media all and (max-width: 800px) {
     .flex-main-container {
         flex-direction: column;
     }

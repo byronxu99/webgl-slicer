@@ -41,7 +41,10 @@ function mousemoveCallback(event) {
 function wheelCallback(event) {
     // scroll up = negative deltaY = zoom in = smaller radius
     // scroll down = positive deltaY = zoom out = larger radius
-    camera.changeRadius(event.deltaY / 5);
+    // deltaMode is whether deltaY is in units of lines or pixels
+    const amount = event.deltaMode? event.deltaY * 8 : event.deltaY / 5;
+    camera.changeRadius(amount);
+    return false;
 }
 
 function contextmenuCallback() {

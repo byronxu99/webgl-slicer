@@ -3,6 +3,7 @@
 import * as twgl from 'twgl.js';
 const m4 = twgl.m4;
 import parseSTL from 'parse-stl';
+import parseOBJ from 'parse-wavefront-obj';
 import JSZip from 'jszip';
 import { saveAs } from 'file-saver/FileSaver';
 
@@ -12,6 +13,7 @@ import * as renderer from './renderer.js';
 import * as settings from './settings.js';
 import * as models from './models.js';
 import * as slicer from './slicer.js';
+import * as lines from './lines.js';
 
 
 // global variables - html canvas objects
@@ -27,9 +29,15 @@ let rerenderSlice = true;
 
 
 function main() {
-    console.log('a');
     // file upload
+    document.getElementById('file_type_select').onchange = fileTypeCallback;
     document.getElementById('file_upload').onchange = fileUploadCallback;
+
+    // line to 3d settings
+    document.getElementById('width_top').value = settings.lineWidthTop;
+    document.getElementById('width_bottom').value = settings.lineWidthBottom;
+    document.getElementById('line_settings_button').onclick = lineSettingsCallback;
+    fileTypeCallback(); // set hidden/shown state
 
     // model manipulation buttons
     document.getElementById('rotate_x_button').onclick = function() { models.rotateModel('x'); };
@@ -46,6 +54,7 @@ function main() {
     // slicing settings
     document.getElementById('slice_plane_angle').oninput         = sliceAngleCallback;
     document.getElementById('printer_slice_thickness').value     = settings.printerSliceThickness;
+    document.getElementById('printer_slice_multisampling').value = settings.offscreenMultisampling;
     document.getElementById('printer_slice_subsampling').value   = settings.printerSliceSubsampling;
 
     // the big "update" button
@@ -62,6 +71,8 @@ function main() {
     requestAnimationFrame(loop);
 }
 
+
+// this is run every frame
 function loop(time) {
     // count fps
     loopCount += 1;
@@ -92,56 +103,38 @@ function loop(time) {
 }
 
 
-
-
-function centerModelCallback() {
-    models.centerModel();
-    slicer.update();
-    rerenderSlice = true;
-};
-
-function sliceAngleCallback() {
-    slicer.setPlaneAngle(document.getElementById('slice_plane_angle').value);
-    slicer.update();
-    rerenderSlice = true;
-}
-
-function slicePositionCallback() {
-    const position = Number(document.getElementById('slice_slider').value);
-    slicer.setSlicePosition(position);
-    slicer.update();
-    rerenderSlice = true;
-}
-
-function updateSettingsCallback() {
-    settings.printerPixelsX = Number(document.getElementById('printer_pixels_x').value);
-    settings.printerPixelsY = Number(document.getElementById('printer_pixels_y').value);
-    settings.printerSizeX   = Number(document.getElementById('printer_size_x').value);
-    settings.printerSizeY   = Number(document.getElementById('printer_size_y').value);
-
-    settings.printerSliceThickness   = Number(document.getElementById('printer_slice_thickness').value);
-    settings.printerSliceSubsampling = Number(document.getElementById('printer_slice_subsampling').value);
-
-    renderer.update();
-    slicer.update();
-
-    rerenderSlice = true;
-};
-
+// handle a file upload
 function fileUploadCallback() {
+    const filetype = document.getElementById('file_type_select').value;
     const file = this.files[0];
 
     const reader = new FileReader();
     reader.onload = function() {
-        const mesh = parseSTL(new Buffer(reader.result));
-        models.loadParsedSTL(mesh);
+        if(filetype === 'stl') {
+            const mesh = parseSTL(new Buffer(reader.result));
+            models.loadParsedSTL(mesh);
+        }
+
+        if(filetype === 'obj') {
+            const mesh = parseOBJ(new Buffer(reader.result));
+            models.loadParsedSTL(mesh); // STL loader also works for OBJ after parsing
+        }
+
+        if(filetype === 'line') {
+            lines.parseArrayBuffer(reader.result);
+            lines.make3dModel();
+        }
+
         renderer.update();
+        rerenderSlice = true;
     };
     reader.readAsArrayBuffer(file);
 }
 
+
+// when the 'download' button pressed
 function downloadCallback() {
-    asyncRenderAndDownload().then(() => {
+    asyncRenderAndDownload().then(function() {
         // reset
         document.getElementById('download_button').innerText = 'Download';
         slicePositionCallback();
@@ -181,6 +174,60 @@ async function asyncRenderAndDownload() {
     const zipfile = await zip.generateAsync({ type: 'blob' });
     saveAs(zipfile, zipname);
 }
+
+
+// misc. ui event handlers
+function fileTypeCallback() {
+    const type = document.getElementById('file_type_select').value;
+    if(type === 'line') {
+        document.getElementById('line_settings').style.display = 'block';
+    } else {
+        document.getElementById('line_settings').style.display = 'none';
+    }
+}
+
+function lineSettingsCallback() {
+    settings.lineWidthTop    = Number(document.getElementById('width_top').value);
+    settings.lineWidthBottom = Number(document.getElementById('width_bottom').value);
+    lines.make3dModel();
+    rerenderSlice = true;
+}
+
+function centerModelCallback() {
+    models.centerModel();
+    slicer.update();
+    rerenderSlice = true;
+};
+
+function sliceAngleCallback() {
+    slicer.setPlaneAngle(document.getElementById('slice_plane_angle').value);
+    slicer.update();
+    rerenderSlice = true;
+}
+
+function slicePositionCallback() {
+    const position = Number(document.getElementById('slice_slider').value);
+    slicer.setSlicePosition(position);
+    slicer.update();
+    rerenderSlice = true;
+}
+
+function updateSettingsCallback() {
+    settings.printerPixelsX = Number(document.getElementById('printer_pixels_x').value);
+    settings.printerPixelsY = Number(document.getElementById('printer_pixels_y').value);
+    settings.printerSizeX   = Number(document.getElementById('printer_size_x').value);
+    settings.printerSizeY   = Number(document.getElementById('printer_size_y').value);
+
+    settings.printerSliceThickness   = Number(document.getElementById('printer_slice_thickness').value);
+    settings.printerSliceSubsampling = Number(document.getElementById('printer_slice_subsampling').value);
+    settings.offscreenMultisampling  = Number(document.getElementById('printer_slice_multisampling').value);
+
+    renderer.update();
+    slicer.update();
+
+    rerenderSlice = true;
+};
+
 
 // start
 main();

@@ -27,6 +27,17 @@ let renderSliceProgram = null;
 let modelAttributeBuffer = null;
 let planeAttributeBuffer = null;
 
+// global variables - offscreen render framebuffer and copy framebuffer
+let offscreen = {
+    framebuffer: null,
+    colorbuffer: null,
+    depthstencil: null,
+};
+let offscreenCopy = {
+    framebuffer: null,
+    colorbuffer: null,
+};
+
 // global variables - clip plane settings for 3d preview
 const zNear = 1;
 const zFar = 3000;
@@ -55,6 +66,10 @@ function init(htmlRenderCanvas, htmlSliceCanvas) {
     render3dProgram     = twgl.createProgramInfo(gl, [shaders.vs3d, shaders.fs3d]);
     renderSliceProgram  = twgl.createProgramInfo(gl, [shaders.vsSlice, shaders.fsSlice]);
 
+    // create offscreen rendering buffers
+    offscreen.framebuffer     = gl.createFramebuffer();
+    offscreenCopy.framebuffer = gl.createFramebuffer();
+
     // register callbacks
     renderCanvas.onmousedown      = ui.mousedownCallback;
     renderCanvas.onmouseup        = ui.mouseupCallback;
@@ -76,7 +91,47 @@ function update() {
     const r = Math.hypot(settings.printerSizeX, settings.printerSizeY);
     camera.setRadius(1.5*r);
 
-    // create attribute buffers for data
+    // bind and set size of the offscreen rendering framebuffer
+    gl.bindFramebuffer(gl.FRAMEBUFFER, offscreen.framebuffer);
+    offscreen.framebuffer.width  = settings.printerPixelsX;
+    offscreen.framebuffer.height = settings.printerPixelsY;
+
+    // create and attach a multisampled color buffer
+    if(offscreen.colorbuffer) gl.deleteRenderbuffer(offscreen.colorbuffer);
+    offscreen.colorbuffer = gl.createRenderbuffer();
+    gl.bindRenderbuffer(gl.RENDERBUFFER, offscreen.colorbuffer);
+    gl.renderbufferStorageMultisample(gl.RENDERBUFFER, settings.offscreenMultisampling, gl.RGBA4, settings.printerPixelsX, settings.printerPixelsY);
+    gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.RENDERBUFFER, offscreen.colorbuffer);
+
+    // create and attach a multisampled depth-stencil buffer
+    if(offscreen.depthstencil) gl.deleteRenderbuffer(offscreen.depthstencil);
+    offscreen.depthstencil = gl.createRenderbuffer();
+    gl.bindRenderbuffer(gl.RENDERBUFFER, offscreen.depthstencil);
+    gl.renderbufferStorageMultisample(gl.RENDERBUFFER, settings.offscreenMultisampling, gl.DEPTH_STENCIL, settings.printerPixelsX, settings.printerPixelsY);
+    gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_STENCIL_ATTACHMENT, gl.RENDERBUFFER, offscreen.depthstencil);
+
+    // bind and set size of the offscreen copy framebuffer
+    gl.bindFramebuffer(gl.FRAMEBUFFER, offscreenCopy.framebuffer);
+    offscreenCopy.framebuffer.width  = settings.printerPixelsX;
+    offscreenCopy.framebuffer.height = settings.printerPixelsY;
+
+    // create and attach a single-sampled color buffer
+    if(offscreenCopy.colorbuffer) gl.deleteRenderbuffer(offscreenCopy.colorbuffer);
+    offscreenCopy.colorbuffer = gl.createRenderbuffer();
+    gl.bindRenderbuffer(gl.RENDERBUFFER, offscreenCopy.colorbuffer);
+    gl.renderbufferStorage(gl.RENDERBUFFER, gl.RGBA4, settings.printerPixelsX, settings.printerPixelsY);
+    gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.RENDERBUFFER, offscreenCopy.colorbuffer);
+
+    // reset to null (on-screen) framebuffer
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+
+    // load model attributes
+    loadModels();
+}
+
+
+// create GL attribute buffers from model data
+function loadModels() {
     modelAttributeBuffer = twgl.createBufferInfoFromArrays(gl, models.getModelData());
     planeAttributeBuffer = twgl.createBufferInfoFromArrays(gl, slicer.getPlaneData());
 }
@@ -84,15 +139,15 @@ function update() {
 
 // render the 3d view of the model and slice plane
 function render3d(time) {
-    // render to screen (null framebuffer) and set aspect
+    // render to screen (null framebuffer) and set viewport
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+    gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
     const aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
 
     // load gpu program
     gl.useProgram(render3dProgram.program);
 
-    // set viewport and clear
-    gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+    // clear screen
     gl.clearColor(0, 0, 0, 1);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
@@ -138,8 +193,15 @@ function render3d(time) {
 
 
 // render the slice to an offscreen canvas buffer
+// this is a multi-step process:
+//     1. render to stencil buffer of multisampled framebuffer (find model-plane intersection)
+//     2. render to color buffer of multisampled framebuffer (fill in pixels of model-plane intersection)
+//     3. copy from multisampled framebuffer to regular framebuffer
+//     4. read pixels off the copy framebuffer
+//     5. create a canvas containing the pixel data
 function renderOffscreen(time) {
     // create and bind offscreen buffer (twgl automatically sets viewport)
+    /*
     const attachments = [
         { format: gl.RGBA4, type: gl.UNSIGNED_BYTE },
         { format: gl.DEPTH_STENCIL },
@@ -147,6 +209,12 @@ function renderOffscreen(time) {
     const framebuffer = twgl.createFramebufferInfo(gl, attachments, settings.printerPixelsX, settings.printerPixelsY);
     const aspect = framebuffer.width / framebuffer.height;
     twgl.bindFramebufferInfo(gl, framebuffer);
+    */
+
+    // bind framebuffer and set viewport
+    gl.bindFramebuffer(gl.FRAMEBUFFER, offscreen.framebuffer);
+    gl.viewport(0, 0, offscreen.framebuffer.width, offscreen.framebuffer.height);
+    const aspect = offscreen.framebuffer.width / offscreen.framebuffer.height;
 
     // load gpu program
     gl.useProgram(renderSliceProgram.program);
@@ -205,6 +273,13 @@ function renderOffscreen(time) {
         twgl.drawBufferInfo(gl, modelAttributeBuffer);
     }
 
+    // copy from multisampled render framebuffer to non-multisampled copy framebuffer
+    gl.bindFramebuffer(gl.READ_FRAMEBUFFER, offscreen.framebuffer);
+    gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER, offscreenCopy.framebuffer);
+    gl.blitFramebuffer(0, 0, offscreen.framebuffer.width, offscreen.framebuffer.height,
+                       0, 0, offscreenCopy.framebuffer.width, offscreenCopy.framebuffer.height,
+                       gl.COLOR_BUFFER_BIT, gl.NEAREST);
+
     // create offscreen canvas as a data buffer
     const canvas  = document.createElement('canvas');
     canvas.width  = settings.printerPixelsX;
@@ -214,7 +289,8 @@ function renderOffscreen(time) {
     // create image data array and load pixels
     const imgData = context.createImageData(settings.printerPixelsX, settings.printerPixelsY);
     const array   = new Uint8Array(imgData.data.buffer);
-    gl.readPixels(0, 0, framebuffer.width, framebuffer.height, gl.RGBA, gl.UNSIGNED_BYTE, array);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, offscreenCopy.framebuffer);
+    gl.readPixels(0, 0, offscreen.framebuffer.width, offscreen.framebuffer.height, gl.RGBA, gl.UNSIGNED_BYTE, array);
 
     // add to canvas
     context.putImageData(imgData, 0, 0);
@@ -256,5 +332,5 @@ function drawOffscreenRender(canvas) {
     });
 }
 
-export { init, update, render3d, renderOffscreen, drawOffscreenRender };
+export { init, update, loadModels, render3d, renderOffscreen, drawOffscreenRender };
 

@@ -28,8 +28,30 @@
 
               <h2>File</h2>
               <div class="vertical-padding">
+                  File type
+                  <select id="file_type_select">
+                      <option value="stl" selected>STL</option>
+                      <option value="obj">OBJ (triangle mesh)</option>
+                      <option value="line">OBJ (line segments)</option>
+                  </select>
+              </div>
+              <div class="vertical-padding">
                   <input id="file_upload" type="file"/>
               </div>
+
+              <div id="line_settings" class="vertical-padding" style="display: none;">
+                  <div class="flex-row justify">
+                      <div>Top width</div>
+                      <input id="width_top" type="text" size="4"/>
+                  </div>
+                  <div class="flex-row justify">
+                      <div>Bottom width</div>
+                      <input id="width_bottom" type="text" size="4"/>
+                  </div>
+                  <div class="vertical-padding"></div>
+                  <button id="line_settings_button" class="big-button">Update</button>
+              </div>
+
               <div class="flex-row justify vertical-padding">
                   <button id="rotate_x_button" class="big-button">Rotate X</button>
                   <button id="rotate_y_button" class="big-button">Rotate Y</button>
@@ -64,6 +86,10 @@
               <div class="flex-row justify">
                   <div>Printer slice thickness</div>
                   <input id="printer_slice_thickness" type="text" size="4"/>
+              </div>
+              <div class="flex-row justify">
+                  <div>Printer slice multisampling</div>
+                  <input id="printer_slice_multisampling" type="text" size="4"/>
               </div>
               <div class="flex-row justify">
                   <div>Printer slice subsampling</div>
