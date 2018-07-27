@@ -170,6 +170,7 @@ function render3d(time) {
         u_modelViewProjection: composeTransformations(model, slice, view, projection),
         u_modelInverseTranspose: m4.transpose(m4.inverse(model)),
         u_light: twgl.v3.normalize(camera.vector()),
+        u_alpha: 1.0,
     });
 
     // render
@@ -185,6 +186,7 @@ function render3d(time) {
         u_modelViewProjection: composeTransformations(planeModel, view, projection),
         u_modelInverseTranspose: m4.transpose(m4.inverse(planeModel)),
         u_light: slicer.getPlaneNormalVector(),
+        u_alpha: 0.5,
     });
 
     // draw plane

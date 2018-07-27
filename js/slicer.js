@@ -117,12 +117,6 @@ function getPlaneData() {
             -x, -y, 0,
              x, -y, 0,
         ])},
-        a_color: { numComponents: 4, data: new Uint8Array([
-            255, 255, 255, 128,
-            255, 255, 255, 128,
-            255, 255, 255, 128,
-            255, 255, 255, 128,
-        ])},
         a_normal: { numComponents: 3, data: new Float32Array([
             0, 0, 1,
             0, 0, 1,

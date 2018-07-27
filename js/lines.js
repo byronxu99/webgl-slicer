@@ -85,7 +85,6 @@ function make3dModel() {
     const model = {
         a_position: { numComponents: 3, data: new Float32Array(3 * numVertices) },
         a_normal:   { numComponents: 3, data: new Float32Array(3 * numVertices) },
-        a_color:    { numComponents: 4, data: new Uint8Array(4 * numVertices).fill(255) },
     };
 
 
