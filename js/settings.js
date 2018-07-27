@@ -15,6 +15,9 @@ export let printerSliceThickness = 0.050;
 // between each slice and stack them together for the final image
 export let printerSliceSubsampling = 1;
 
+// color to render the slice
+export let sliceColor = [255, 255, 255];
+
 // line segment to 3d solid settings
 export let lineWidthTop    = 1;
 export let lineWidthBottom = 1;

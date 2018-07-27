@@ -202,17 +202,6 @@ function render3d(time) {
 //     4. read pixels off the copy framebuffer
 //     5. create a canvas containing the pixel data
 function renderOffscreen(time) {
-    // create and bind offscreen buffer (twgl automatically sets viewport)
-    /*
-    const attachments = [
-        { format: gl.RGBA4, type: gl.UNSIGNED_BYTE },
-        { format: gl.DEPTH_STENCIL },
-    ];
-    const framebuffer = twgl.createFramebufferInfo(gl, attachments, settings.printerPixelsX, settings.printerPixelsY);
-    const aspect = framebuffer.width / framebuffer.height;
-    twgl.bindFramebufferInfo(gl, framebuffer);
-    */
-
     // bind framebuffer and set viewport
     gl.bindFramebuffer(gl.FRAMEBUFFER, offscreen.framebuffer);
     gl.viewport(0, 0, offscreen.framebuffer.width, offscreen.framebuffer.height);
@@ -222,10 +211,8 @@ function renderOffscreen(time) {
     gl.useProgram(renderSliceProgram.program);
     gl.disable(gl.DEPTH_TEST);
     gl.disable(gl.CULL_FACE);
-
-    // add color values (for sub-slice rendering)
     gl.enable(gl.BLEND);
-    gl.blendFunc(gl.ONE, gl.ONE);
+    gl.blendFunc(gl.ONE, gl.ONE); // add colors
 
     // clear canvas
     gl.clearColor(0, 0, 0, 1);
@@ -245,7 +232,9 @@ function renderOffscreen(time) {
     // set render color as (1/subsamples) so that when a pixel
     // is contained in all subsamples it is rendered 100% white
     twgl.setUniforms(renderSliceProgram, {
-        u_color: 1.0 / settings.printerSliceSubsampling,
+        u_r: settings.sliceColor[0] / 255 / settings.printerSliceSubsampling,
+        u_g: settings.sliceColor[1] / 255 / settings.printerSliceSubsampling,
+        u_b: settings.sliceColor[2] / 255 / settings.printerSliceSubsampling,
     });
 
     // render for each sub-slice

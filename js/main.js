@@ -14,7 +14,7 @@ import * as settings from './settings.js';
 import * as models from './models.js';
 import * as slicer from './slicer.js';
 import * as lines from './lines.js';
-import { degToRad } from './helpers.js';
+import { degToRad, colorToString, stringToColor } from './helpers.js';
 
 
 // global variables - html canvas objects
@@ -57,6 +57,9 @@ function main() {
     document.getElementById('printer_slice_thickness').value     = settings.printerSliceThickness;
     document.getElementById('printer_slice_multisampling').value = settings.offscreenMultisampling;
     document.getElementById('printer_slice_subsampling').value   = settings.printerSliceSubsampling;
+
+    // render color settings
+    document.getElementById('slice_color').value = colorToString(settings.sliceColor);
 
     // the big "update" button
     document.getElementById('printer_settings_button').onclick = updateSettingsCallback;
@@ -232,6 +235,8 @@ function updateSettingsCallback() {
 
     const angle = degToRad(Number(document.getElementById('slice_plane_angle').value));
     slicer.setPlaneAngle(angle);
+
+    settings.sliceColor = stringToColor(document.getElementById('slice_color').value);
 
     renderer.update();
     slicer.update();

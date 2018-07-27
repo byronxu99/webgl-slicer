@@ -16,13 +16,15 @@ export const fsSlice = `#version 300 es
 precision mediump float;
 
 // uniforms
-uniform float u_color;
+uniform float u_r;
+uniform float u_g;
+uniform float u_b;
 
 // output
 out vec4 outColor;
 
 void main() {
-    outColor = vec4(u_color, u_color, u_color, 1);
+    outColor = vec4(u_r, u_g, u_b, 1);
 }`;
 
 
