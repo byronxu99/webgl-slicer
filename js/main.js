@@ -14,6 +14,7 @@ import * as settings from './settings.js';
 import * as models from './models.js';
 import * as slicer from './slicer.js';
 import * as lines from './lines.js';
+import { degToRad } from './helpers.js';
 
 
 // global variables - html canvas objects
@@ -52,7 +53,7 @@ function main() {
     document.getElementById('printer_size_y').value   = settings.printerSizeY;
 
     // slicing settings
-    document.getElementById('slice_plane_angle').oninput         = sliceAngleCallback;
+    document.getElementById('slice_plane_angle').value           = '0';
     document.getElementById('printer_slice_thickness').value     = settings.printerSliceThickness;
     document.getElementById('printer_slice_multisampling').value = settings.offscreenMultisampling;
     document.getElementById('printer_slice_subsampling').value   = settings.printerSliceSubsampling;
@@ -133,13 +134,24 @@ function fileUploadCallback() {
 
 
 // when the 'download' button pressed
+let slicing = false;
 function downloadCallback() {
-    asyncRenderAndDownload().then(function() {
-        // reset
-        document.getElementById('download_button').innerText = 'Download';
-        slicePositionCallback();
-        rerenderSlice = true;
-    });
+    // already slicing, we want to cancel
+    if(slicing) {
+        slicing = false;
+    }
+
+    // begin slicing
+    else{
+        slicing = true;
+        asyncRenderAndDownload().then(function() {
+            // reset
+            document.getElementById('download_button').innerText = 'Download';
+            slicePositionCallback();
+            rerenderSlice = true;
+            slicing = false;
+        });
+    }
 }
 
 async function asyncRenderAndDownload() {
@@ -154,7 +166,7 @@ async function asyncRenderAndDownload() {
 
     let sliceNumber = 0;
     do {
-        document.getElementById('download_button').innerText = `Rendering (${sliceNumber})`;
+        document.getElementById('download_button').innerText = `Rendering ${sliceNumber} (click to cancel)`;
 
         // render a slice to an offscreen canvas
         const canvas = renderer.renderOffscreen();
@@ -167,12 +179,14 @@ async function asyncRenderAndDownload() {
 
         zip.file(filename, blob);
         sliceNumber += 1;
-    } while(slicer.loadNextSlice());
+    } while(slicing && slicer.loadNextSlice());
 
     // save zip file
-    document.getElementById('download_button').innerText = 'Saving...';
-    const zipfile = await zip.generateAsync({ type: 'blob' });
-    saveAs(zipfile, zipname);
+    if(slicing) {
+        document.getElementById('download_button').innerText = 'Saving...';
+        const zipfile = await zip.generateAsync({ type: 'blob' });
+        saveAs(zipfile, zipname);
+    }
 }
 
 
@@ -199,12 +213,6 @@ function centerModelCallback() {
     rerenderSlice = true;
 };
 
-function sliceAngleCallback() {
-    slicer.setPlaneAngle(document.getElementById('slice_plane_angle').value);
-    slicer.update();
-    rerenderSlice = true;
-}
-
 function slicePositionCallback() {
     const position = Number(document.getElementById('slice_slider').value);
     slicer.setSlicePosition(position);
@@ -221,6 +229,9 @@ function updateSettingsCallback() {
     settings.printerSliceThickness   = Number(document.getElementById('printer_slice_thickness').value);
     settings.printerSliceSubsampling = Number(document.getElementById('printer_slice_subsampling').value);
     settings.offscreenMultisampling  = Number(document.getElementById('printer_slice_multisampling').value);
+
+    const angle = degToRad(Number(document.getElementById('slice_plane_angle').value));
+    slicer.setPlaneAngle(angle);
 
     renderer.update();
     slicer.update();

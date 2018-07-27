@@ -122,8 +122,9 @@ function make3dModel() {
         const nv = v3.normalize(v);
         const neg_nv = v3.mulScalar(nv, -1.0);
 
-        // test if v is parallel to [1,0,0] (same as nv is equal to [1,0,0])
-        const parallel = v3.distanceSq(nv, [1,0,0]) < 0.00001;
+        // test if v is parallel to [1,0,0]
+        // same as nv is equal to [+/-1,0,0]
+        const parallel = v3.distanceSq(nv, [1,0,0]) < 0.00001 || v3.distanceSq(nv, [-1,0,0]) < 0.00001;
 
         // get a vector not parallel to v
         const np = parallel? [0,1,0] : [1,0,0];
