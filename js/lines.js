@@ -48,6 +48,14 @@ function parseArrayBuffer(arraybuffer) {
                 indices.push([l1, l2]);
             }
         }
+
+        // bspline curve representation of one line segment:
+        // curv 30 40 1 2
+        if(words[0] === 'curv') {
+            const l1 = Number(words[3]);
+            const l2 = Number(words[4]);
+            indices.push([l1, l2]);
+        }
     });
 
     // de-index the line segments and put in lineData

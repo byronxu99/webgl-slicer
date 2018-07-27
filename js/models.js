@@ -3,6 +3,7 @@
 import { m4 } from 'twgl.js';
 
 import * as settings from './settings.js';
+import * as slicer from './slicer.js';
 import * as data from './data.js';
 import { degToRad, composeTransformations } from './helpers.js';
 
@@ -138,15 +139,32 @@ function rotateModel(axis) {
 
 function centerModel() {
     // find translation to center the un-rotated model
-    const x = -1 * (modelBounds.x_min + modelBounds.x_max) / 2
-    const y = -1 * (modelBounds.y_min + modelBounds.y_max) / 2
-    const z = -1 * (modelBounds.z_min + modelBounds.z_max) / 2
-    const translation = m4.translation([x, y, z]);
+    const xCenter = -1 * (modelBounds.x_min + modelBounds.x_max) / 2
+    const yCenter = -1 * (modelBounds.y_min + modelBounds.y_max) / 2
+    const zCenter = -1 * (modelBounds.z_min + modelBounds.z_max) / 2
+    const centering = m4.translation([xCenter, yCenter, zCenter]);
 
     // get rotation portion of the current transformation matrix
     const rotation = m4.setTranslation(modelMatrix, [0, 0, 0]);
 
-    modelMatrix = composeTransformations(translation, rotation);
+    // find y-coordinate of slice plane bottom
+    const cosAngle = slicer.getPlaneNormalVector()[2];
+    const minY     = -0.5 * cosAngle * settings.printerSizeY;
+
+    // corner of the model after centering
+    const xDist = (modelBounds.x_max - modelBounds.x_min) / 2;
+    const yDist = (modelBounds.y_max - modelBounds.y_min) / 2;
+    const zDist = (modelBounds.z_max - modelBounds.z_min) / 2;
+    const corner = [xDist, yDist, zDist];
+
+    // corner after rotating
+    const rotatedCorner = m4.transformPoint(rotation, corner);
+
+    // find translation to align bottom edge of model to bottom edge of plane
+    const alignY   = minY + Math.abs(rotatedCorner[1]);
+    const align    = m4.translation([0, alignY, 0]);
+
+    modelMatrix = composeTransformations(centering, rotation, align);
 }
 
 export { loadParsedSTL, loadModel, getModelData, getModelBounds, getModelMatrix, rotateModel, centerModel };
