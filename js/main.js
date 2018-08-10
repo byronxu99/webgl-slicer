@@ -211,6 +211,11 @@ function downloadMenu(zipBlob) {
 // upload zip blob to a remote address
 function uploadToRemoteServer(zipBlob) {
     const url = document.getElementById('post_address').value;
+    if(!url) {
+        document.getElementById('upload_button').innerText = 'Please fill out URL below';
+        return;
+    }
+
     document.getElementById('upload_button').innerText = 'Uploading...';
 
     const formData = new FormData();
