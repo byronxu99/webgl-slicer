@@ -205,7 +205,6 @@ function renderOffscreen(time) {
     // bind framebuffer and set viewport
     gl.bindFramebuffer(gl.FRAMEBUFFER, offscreen.framebuffer);
     gl.viewport(0, 0, offscreen.framebuffer.width, offscreen.framebuffer.height);
-    const aspect = offscreen.framebuffer.width / offscreen.framebuffer.height;
 
     // load gpu program
     gl.useProgram(renderSliceProgram.program);

@@ -119,7 +119,7 @@ function getModelBounds() {
 }
 
 // a matrix that positions the model in world-space
-function getModelMatrix(time) {
+function getModelMatrix() {
     return modelMatrix;
 }
 
@@ -137,9 +137,9 @@ function rotateModel(axis) {
 
 function centerModel() {
     // find translation to center the un-rotated model
-    const xCenter = -1 * (modelBounds.x_min + modelBounds.x_max) / 2
-    const yCenter = -1 * (modelBounds.y_min + modelBounds.y_max) / 2
-    const zCenter = -1 * (modelBounds.z_min + modelBounds.z_max) / 2
+    const xCenter = -1 * (modelBounds.x_min + modelBounds.x_max) / 2;
+    const yCenter = -1 * (modelBounds.y_min + modelBounds.y_max) / 2;
+    const zCenter = -1 * (modelBounds.z_min + modelBounds.z_max) / 2;
     const centering = m4.translation([xCenter, yCenter, zCenter]);
 
     // get rotation portion of the current transformation matrix
@@ -171,263 +171,263 @@ function centerModel() {
 // from https://webgl2fundamentals.org/
 const defaultData = {
     a_position: { numComponents: 3, data: new Float32Array([
-          // left column front
-          0,   0,  0,
-          0, 15,  0,
-          3,   0,  0,
-          0, 15,  0,
-          3, 15,  0,
-          3,   0,  0,
+        // left column front
+        0,   0,  0,
+        0, 15,  0,
+        3,   0,  0,
+        0, 15,  0,
+        3, 15,  0,
+        3,   0,  0,
 
-          // top rung front
-          3,   0,  0,
-          3,  3,  0,
-          10,   0,  0,
-          3,  3,  0,
-          10,  3,  0,
-          10,   0,  0,
+        // top rung front
+        3,   0,  0,
+        3,  3,  0,
+        10,   0,  0,
+        3,  3,  0,
+        10,  3,  0,
+        10,   0,  0,
 
-          // middle rung front
-          3,  6,  0,
-          3,  9,  0,
-          6.7,  6,  0,
-          3,  9,  0,
-          6.7,  9,  0,
-          6.7,  6,  0,
+        // middle rung front
+        3,  6,  0,
+        3,  9,  0,
+        6.7,  6,  0,
+        3,  9,  0,
+        6.7,  9,  0,
+        6.7,  6,  0,
 
-          // left column back
-            0,   0,  3,
-           3,   0,  3,
-            0, 15,  3,
-            0, 15,  3,
-           3,   0,  3,
-           3, 15,  3,
+        // left column back
+        0,   0,  3,
+        3,   0,  3,
+        0, 15,  3,
+        0, 15,  3,
+        3,   0,  3,
+        3, 15,  3,
 
-          // top rung back
-           3,   0,  3,
-          10,   0,  3,
-           3,  3,  3,
-           3,  3,  3,
-          10,   0,  3,
-          10,  3,  3,
+        // top rung back
+        3,   0,  3,
+        10,   0,  3,
+        3,  3,  3,
+        3,  3,  3,
+        10,   0,  3,
+        10,  3,  3,
 
-          // middle rung back
-           3,  6,  3,
-           6.7,  6,  3,
-           3,  9,  3,
-           3,  9,  3,
-           6.7,  6,  3,
-           6.7,  9,  3,
+        // middle rung back
+        3,  6,  3,
+        6.7,  6,  3,
+        3,  9,  3,
+        3,  9,  3,
+        6.7,  6,  3,
+        6.7,  9,  3,
 
-          // top
-            0,   0,   0,
-          10,   0,   0,
-          10,   0,  3,
-            0,   0,   0,
-          10,   0,  3,
-            0,   0,  3,
+        // top
+        0,   0,   0,
+        10,   0,   0,
+        10,   0,  3,
+        0,   0,   0,
+        10,   0,  3,
+        0,   0,  3,
 
-          // top rung right
-          10,   0,   0,
-          10,  3,   0,
-          10,  3,  3,
-          10,   0,   0,
-          10,  3,  3,
-          10,   0,  3,
+        // top rung right
+        10,   0,   0,
+        10,  3,   0,
+        10,  3,  3,
+        10,   0,   0,
+        10,  3,  3,
+        10,   0,  3,
 
-          // under top rung
-          3,   3,   0,
-          3,   3,  3,
-          10,  3,  3,
-          3,   3,   0,
-          10,  3,  3,
-          10,  3,   0,
+        // under top rung
+        3,   3,   0,
+        3,   3,  3,
+        10,  3,  3,
+        3,   3,   0,
+        10,  3,  3,
+        10,  3,   0,
 
-          // between top rung and middle
-          3,   3,   0,
-          3,   6,  3,
-          3,   3,  3,
-          3,   3,   0,
-          3,   6,   0,
-          3,   6,  3,
+        // between top rung and middle
+        3,   3,   0,
+        3,   6,  3,
+        3,   3,  3,
+        3,   3,   0,
+        3,   6,   0,
+        3,   6,  3,
 
-          // top of middle rung
-          3,   6,   0,
-          6.7,   6,  3,
-          3,   6,  3,
-          3,   6,   0,
-          6.7,   6,   0,
-          6.7,   6,  3,
+        // top of middle rung
+        3,   6,   0,
+        6.7,   6,  3,
+        3,   6,  3,
+        3,   6,   0,
+        6.7,   6,   0,
+        6.7,   6,  3,
 
-          // right of middle rung
-          6.7,   6,   0,
-          6.7,   9,  3,
-          6.7,   6,  3,
-          6.7,   6,   0,
-          6.7,   9,   0,
-          6.7,   9,  3,
+        // right of middle rung
+        6.7,   6,   0,
+        6.7,   9,  3,
+        6.7,   6,  3,
+        6.7,   6,   0,
+        6.7,   9,   0,
+        6.7,   9,  3,
 
-          // bottom of middle rung.
-          3,   9,   0,
-          3,   9,  3,
-          6.7,   9,  3,
-          3,   9,   0,
-          6.7,   9,  3,
-          6.7,   9,   0,
+        // bottom of middle rung.
+        3,   9,   0,
+        3,   9,  3,
+        6.7,   9,  3,
+        3,   9,   0,
+        6.7,   9,  3,
+        6.7,   9,   0,
 
-          // right of bottom
-          3,   9,   0,
-          3,  15,  3,
-          3,   9,  3,
-          3,   9,   0,
-          3,  15,   0,
-          3,  15,  3,
+        // right of bottom
+        3,   9,   0,
+        3,  15,  3,
+        3,   9,  3,
+        3,   9,   0,
+        3,  15,   0,
+        3,  15,  3,
 
-          // bottom
-          0,   15,   0,
-          0,   15,  3,
-          3,  15,  3,
-          0,   15,   0,
-          3,  15,  3,
-          3,  15,   0,
+        // bottom
+        0,   15,   0,
+        0,   15,  3,
+        3,  15,  3,
+        0,   15,   0,
+        3,  15,  3,
+        3,  15,   0,
 
-          // left side
-          0,   0,   0,
-          0,   0,  3,
-          0, 15,  3,
-          0,   0,   0,
-          0, 15,  3,
-          0, 15,   0,
-  ]) },
+        // left side
+        0,   0,   0,
+        0,   0,  3,
+        0, 15,  3,
+        0,   0,   0,
+        0, 15,  3,
+        0, 15,   0,
+    ]) },
     a_normal: { numComponents: 3, data: new Float32Array([
-          // left column front
-          0, 0, 1,
-          0, 0, 1,
-          0, 0, 1,
-          0, 0, 1,
-          0, 0, 1,
-          0, 0, 1,
+        // left column front
+        0, 0, 1,
+        0, 0, 1,
+        0, 0, 1,
+        0, 0, 1,
+        0, 0, 1,
+        0, 0, 1,
 
-          // top rung front
-          0, 0, 1,
-          0, 0, 1,
-          0, 0, 1,
-          0, 0, 1,
-          0, 0, 1,
-          0, 0, 1,
+        // top rung front
+        0, 0, 1,
+        0, 0, 1,
+        0, 0, 1,
+        0, 0, 1,
+        0, 0, 1,
+        0, 0, 1,
 
-          // middle rung front
-          0, 0, 1,
-          0, 0, 1,
-          0, 0, 1,
-          0, 0, 1,
-          0, 0, 1,
-          0, 0, 1,
- 
-          // left column back
-          0, 0, -1,
-          0, 0, -1,
-          0, 0, -1,
-          0, 0, -1,
-          0, 0, -1,
-          0, 0, -1,
- 
-          // top rung back
-          0, 0, -1,
-          0, 0, -1,
-          0, 0, -1,
-          0, 0, -1,
-          0, 0, -1,
-          0, 0, -1,
- 
-          // middle rung back
-          0, 0, -1,
-          0, 0, -1,
-          0, 0, -1,
-          0, 0, -1,
-          0, 0, -1,
-          0, 0, -1,
- 
-          // top
-          0, 1, 0,
-          0, 1, 0,
-          0, 1, 0,
-          0, 1, 0,
-          0, 1, 0,
-          0, 1, 0,
- 
-          // top rung right
-          -1, 0, 0,
-          -1, 0, 0,
-          -1, 0, 0,
-          -1, 0, 0,
-          -1, 0, 0,
-          -1, 0, 0,
- 
-          // under top rung
-          0, -1, 0,
-          0, -1, 0,
-          0, -1, 0,
-          0, -1, 0,
-          0, -1, 0,
-          0, -1, 0,
- 
-          // between top rung and middle
-          -1, 0, 0,
-          -1, 0, 0,
-          -1, 0, 0,
-          -1, 0, 0,
-          -1, 0, 0,
-          -1, 0, 0,
- 
-          // top of middle rung
-          0, 1, 0,
-          0, 1, 0,
-          0, 1, 0,
-          0, 1, 0,
-          0, 1, 0,
-          0, 1, 0,
- 
-          // right of middle rung
-          -1, 0, 0,
-          -1, 0, 0,
-          -1, 0, 0,
-          -1, 0, 0,
-          -1, 0, 0,
-          -1, 0, 0,
- 
-          // bottom of middle rung.
-          0, -1, 0,
-          0, -1, 0,
-          0, -1, 0,
-          0, -1, 0,
-          0, -1, 0,
-          0, -1, 0,
- 
-          // right of bottom
-          -1, 0, 0,
-          -1, 0, 0,
-          -1, 0, 0,
-          -1, 0, 0,
-          -1, 0, 0,
-          -1, 0, 0,
- 
-          // bottom
-          0, -1, 0,
-          0, -1, 0,
-          0, -1, 0,
-          0, -1, 0,
-          0, -1, 0,
-          0, -1, 0,
- 
-          // left side
-          1, 0, 0,
-          1, 0, 0,
-          1, 0, 0,
-          1, 0, 0,
-          1, 0, 0,
-          1, 0, 0,
-  ]) },
+        // middle rung front
+        0, 0, 1,
+        0, 0, 1,
+        0, 0, 1,
+        0, 0, 1,
+        0, 0, 1,
+        0, 0, 1,
+
+        // left column back
+        0, 0, -1,
+        0, 0, -1,
+        0, 0, -1,
+        0, 0, -1,
+        0, 0, -1,
+        0, 0, -1,
+
+        // top rung back
+        0, 0, -1,
+        0, 0, -1,
+        0, 0, -1,
+        0, 0, -1,
+        0, 0, -1,
+        0, 0, -1,
+
+        // middle rung back
+        0, 0, -1,
+        0, 0, -1,
+        0, 0, -1,
+        0, 0, -1,
+        0, 0, -1,
+        0, 0, -1,
+
+        // top
+        0, 1, 0,
+        0, 1, 0,
+        0, 1, 0,
+        0, 1, 0,
+        0, 1, 0,
+        0, 1, 0,
+
+        // top rung right
+        -1, 0, 0,
+        -1, 0, 0,
+        -1, 0, 0,
+        -1, 0, 0,
+        -1, 0, 0,
+        -1, 0, 0,
+
+        // under top rung
+        0, -1, 0,
+        0, -1, 0,
+        0, -1, 0,
+        0, -1, 0,
+        0, -1, 0,
+        0, -1, 0,
+
+        // between top rung and middle
+        -1, 0, 0,
+        -1, 0, 0,
+        -1, 0, 0,
+        -1, 0, 0,
+        -1, 0, 0,
+        -1, 0, 0,
+
+        // top of middle rung
+        0, 1, 0,
+        0, 1, 0,
+        0, 1, 0,
+        0, 1, 0,
+        0, 1, 0,
+        0, 1, 0,
+
+        // right of middle rung
+        -1, 0, 0,
+        -1, 0, 0,
+        -1, 0, 0,
+        -1, 0, 0,
+        -1, 0, 0,
+        -1, 0, 0,
+
+        // bottom of middle rung.
+        0, -1, 0,
+        0, -1, 0,
+        0, -1, 0,
+        0, -1, 0,
+        0, -1, 0,
+        0, -1, 0,
+
+        // right of bottom
+        -1, 0, 0,
+        -1, 0, 0,
+        -1, 0, 0,
+        -1, 0, 0,
+        -1, 0, 0,
+        -1, 0, 0,
+
+        // bottom
+        0, -1, 0,
+        0, -1, 0,
+        0, -1, 0,
+        0, -1, 0,
+        0, -1, 0,
+        0, -1, 0,
+
+        // left side
+        1, 0, 0,
+        1, 0, 0,
+        1, 0, 0,
+        1, 0, 0,
+        1, 0, 0,
+        1, 0, 0,
+    ]) },
 };
 
 

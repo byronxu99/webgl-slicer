@@ -1,10 +1,10 @@
 'use strict';
 
 import * as twgl from 'twgl.js';
-const m4 = twgl.m4;
 import parseSTL from 'parse-stl';
 import parseOBJ from 'parse-wavefront-obj';
 import JSZip from 'jszip';
+import dialogPolyfill from 'dialog-polyfill';
 import { saveAs } from 'file-saver/FileSaver';
 
 // local imports
@@ -67,8 +67,8 @@ function main() {
     // slice position slider
     document.getElementById('slice_slider').oninput  = slicePositionCallback;
 
-    // the big "download" button
-    document.getElementById('download_button').onclick = downloadCallback;
+    // the big "slice" button
+    document.getElementById('slice_button').onclick = sliceCallback;
 
     // initialize and run
     renderer.init(renderCanvas, sliceCanvas);
@@ -77,7 +77,7 @@ function main() {
 
 
 // this is run every frame
-function loop(time) {
+function loop() {
     // count fps
     loopCount += 1;
     if(loopCount > 10) {
@@ -136,46 +136,50 @@ function fileUploadCallback() {
 }
 
 
-// when the 'download' button pressed
+// when the 'slice' button pressed
 let slicing = false;
-function downloadCallback() {
+function sliceCallback() {
     // already slicing, we want to cancel
     if(slicing) {
         slicing = false;
     }
 
     // begin slicing
-    else{
+    else {
         slicing = true;
-        asyncRenderAndDownload().then(function() {
+        asyncRender().then(zipfile => {
+            // make popup
+            if(zipfile) {
+                downloadMenu(zipfile);
+            }
+
             // reset
-            document.getElementById('download_button').innerText = 'Download';
+            slicing = false;
+            document.getElementById('slice_button').innerText = 'Slice';
             slicePositionCallback();
             rerenderSlice = true;
-            slicing = false;
         });
     }
 }
 
-async function asyncRenderAndDownload() {
-    const file = document.getElementById('file_upload').files[0];
-    const zipname = file? file.name+'.zip' : 'slices.zip';
+// render slices and return promise of a zip file
+async function asyncRender() {
     const zip = new JSZip();
 
     // render slices
-    document.getElementById('download_button').innerText = 'Rendering...';
+    document.getElementById('slice_button').innerText = 'Rendering...';
     slicer.setSlicePosition(0);
     slicer.update();
 
     let sliceNumber = 0;
     do {
-        document.getElementById('download_button').innerText = `Rendering ${sliceNumber} (click to cancel)`;
+        document.getElementById('slice_button').innerText = `Rendering ${sliceNumber} (click to cancel)`;
 
         // render a slice to an offscreen canvas
         const canvas = renderer.renderOffscreen();
 
         // convert canvas to png blob
-        const blob = await new Promise((resolve, reject) => {
+        const blob = await new Promise(resolve => {
             canvas.toBlob(resolve);
         });
         const filename = `slices/${sliceNumber}.png`;
@@ -184,12 +188,49 @@ async function asyncRenderAndDownload() {
         sliceNumber += 1;
     } while(slicing && slicer.loadNextSlice());
 
-    // save zip file
+    // if slicing wasn't cancelled, save zip file
     if(slicing) {
-        document.getElementById('download_button').innerText = 'Saving...';
+        document.getElementById('slice_button').innerText = 'Saving...';
         const zipfile = await zip.generateAsync({ type: 'blob' });
-        saveAs(zipfile, zipname);
+        return zipfile;
     }
+}
+
+// make a download/upload zip popup
+function downloadMenu(zipBlob) {
+    const popup = document.getElementById('download_popup');
+    dialogPolyfill.registerDialog(popup);
+
+    document.getElementById('close_button').onclick    = function() { popup.close(); };
+    document.getElementById('download_button').onclick = function() { saveAs(zipBlob); };
+    document.getElementById('upload_button').onclick   = function() { uploadToRemoteServer(zipBlob); };
+    document.getElementById('upload_button').innerText = 'POST to remote address:';
+    popup.showModal();
+}
+
+// upload zip blob to a remote address
+function uploadToRemoteServer(zipBlob) {
+    const url = document.getElementById('post_address').value;
+    document.getElementById('upload_button').innerText = 'Uploading...';
+
+    const formData = new FormData();
+    formData.append('file', zipBlob);
+
+    fetch(url, {
+        method: 'POST',
+        cache: 'no-store',
+        mode: 'no-cors',
+        body: formData,
+    }).then(response => {
+        if(response.ok) {
+            document.getElementById('upload_button').innerText = 'Upload successful';
+        } else {
+            document.getElementById('upload_button').innerText = `${response.status} ${response.statusText}`;
+        }
+    }).catch(error => {
+        document.getElementById('upload_button').innerText = 'Error! (see browser console)';
+        console.log(error);
+    });
 }
 
 
@@ -214,7 +255,7 @@ function centerModelCallback() {
     models.centerModel();
     slicer.update();
     rerenderSlice = true;
-};
+}
 
 function slicePositionCallback() {
     const position = Number(document.getElementById('slice_slider').value);
@@ -242,7 +283,7 @@ function updateSettingsCallback() {
     slicer.update();
 
     rerenderSlice = true;
-};
+}
 
 
 // start

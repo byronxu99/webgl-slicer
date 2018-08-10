@@ -21,6 +21,25 @@
   <![endif]-->
 
   <!-- Add your site or application content here -->
+  <dialog id="download_popup">
+    <h1 class="center-text">Slicing complete!</h1>
+    <div class="vertical-padding">
+        <button id="download_button" class="big-button">Download ZIP</button>
+    </div>
+
+    <div class="vertical-padding">
+        <button id="upload_button" class="big-button">POST to remote address:</button>
+    </div>
+
+    <div class="vertical-padding">
+        <input id="post_address" type="text" size="32" placeholder="www.example.com/api/file_upload"/>
+    </div>
+
+    <div class="dialog-footer">
+        <button id="close_button">Done</button>
+    </div>
+  </dialog>
+
   <div class="flex-main-container fullscreen justify">
       <div class="flex-column">
           <div class="program-info">
@@ -112,7 +131,7 @@
               <div id="slice_info" class="vertical-padding">0 slices total</div>
 
               <div class="vertical-padding"></div>
-              <button id="download_button" class="big-button">Download</button>
+              <button id="slice_button" class="big-button">Slice</button>
           </div>
       </div>
 

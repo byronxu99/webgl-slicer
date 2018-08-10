@@ -165,6 +165,34 @@ canvas {
     padding: 2px 2px;
 }
 
+dialog {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+dialog::backdrop {
+    background-color: rgba(0, 0, 0, 0.25);
+}
+
+dialog + .backdrop {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background-color: rgba(0, 0, 0, 0.25);
+}
+
+.dialog-footer {
+    padding-top: 30px;
+    padding-bottom: 10px;
+}
+
+.center-text {
+    text-align: center;
+}
+
 
 /* ==========================================================================
    Helper classes

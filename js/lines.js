@@ -32,9 +32,9 @@ function parseArrayBuffer(arraybuffer) {
         // vertex data:
         // v 0.123 0.234 0.345
         if(words[0] === 'v') {
-            const v1 = Number(words[1])
-            const v2 = Number(words[2])
-            const v3 = Number(words[3])
+            const v1 = Number(words[1]);
+            const v2 = Number(words[2]);
+            const v3 = Number(words[3]);
             vertices.push([v1, v2, v3]);
         }
 
@@ -113,7 +113,7 @@ function make3dModel() {
     }
 
 
-    lineData.forEach(([a, b], index) => {
+    lineData.forEach(([a, b]) => {
         // vector from a to b
         const v = v3.subtract(b, a);
 
