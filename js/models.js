@@ -100,7 +100,6 @@ function loadModel(model) {
     }
 
     modelBounds = bounds;
-    console.log(modelBounds);
 }
 
 // return vertex data for the model
