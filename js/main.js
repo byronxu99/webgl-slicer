@@ -30,21 +30,10 @@ let rerenderSlice = true;
 
 
 function main() {
-    // file upload
-    document.getElementById('file_type_select').onchange = fileTypeCallback;
-    document.getElementById('file_upload').onchange = fileUploadCallback;
-
+    // set input field default values
     // line to 3d settings
     document.getElementById('width_top').value = settings.lineWidthTop;
     document.getElementById('width_bottom').value = settings.lineWidthBottom;
-    document.getElementById('line_settings_button').onclick = lineSettingsCallback;
-    fileTypeCallback(); // set hidden/shown state
-
-    // model manipulation buttons
-    document.getElementById('rotate_x_button').onclick = function() { models.rotateModel('x'); };
-    document.getElementById('rotate_y_button').onclick = function() { models.rotateModel('y'); };
-    document.getElementById('rotate_z_button').onclick = function() { models.rotateModel('z'); };
-    document.getElementById('center_button').onclick   = centerModelCallback;
 
     // printer dimension settings
     document.getElementById('printer_pixels_x').value = settings.printerPixelsX;
@@ -61,14 +50,8 @@ function main() {
     // render color settings
     document.getElementById('slice_color').value = colorToString(settings.sliceColor);
 
-    // the big "update" button
-    document.getElementById('printer_settings_button').onclick = updateSettingsCallback;
-
-    // slice position slider
-    document.getElementById('slice_slider').oninput  = slicePositionCallback;
-
-    // the big "slice" button
-    document.getElementById('slice_button').onclick = sliceCallback;
+    // bind callbacks
+    initCallbacks();
 
     // initialize and run
     renderer.init(renderCanvas, sliceCanvas);
@@ -105,6 +88,35 @@ function loop() {
     // run again next frame
     requestAnimationFrame(loop);
 }
+
+
+// bind callbacks to UI elements
+function initCallbacks() {
+    // file upload
+    document.getElementById('file_type_select').onchange = fileTypeCallback;
+    document.getElementById('file_upload').onchange = fileUploadCallback;
+
+    // line to 3d settings
+    document.getElementById('line_settings_button').onclick = lineSettingsCallback;
+    fileTypeCallback(); // set hidden/shown state
+
+    // model manipulation buttons
+    document.getElementById('rotate_x_button').onclick = function() { models.rotateModel('x'); };
+    document.getElementById('rotate_y_button').onclick = function() { models.rotateModel('y'); };
+    document.getElementById('rotate_z_button').onclick = function() { models.rotateModel('z'); };
+    document.getElementById('center_button').onclick   = centerModelCallback;
+
+    // the big "update" button
+    document.getElementById('printer_settings_button').onclick = updateSettingsCallback;
+
+    // slice position slider
+    document.getElementById('slice_slider').oninput  = slicePositionCallback;
+
+    // the big "slice" button
+    document.getElementById('slice_button').onclick = sliceCallback;
+}
+
+
 
 
 // handle a file upload
@@ -237,6 +249,9 @@ function uploadToRemoteServer(zipBlob) {
         console.log(error);
     });
 }
+
+
+
 
 
 // misc. ui event handlers
