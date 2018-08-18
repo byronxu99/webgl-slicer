@@ -84,11 +84,11 @@ function loadModel(model) {
     // find bounds
     let bounds = {
         x_min: Number.MAX_VALUE,
-        x_max: Number.MIN_VALUE,
         y_min: Number.MAX_VALUE,
-        y_max: Number.MIN_VALUE,
         z_min: Number.MAX_VALUE,
-        z_max: Number.MIN_VALUE,
+        x_max: -1*Number.MAX_VALUE,
+        y_max: -1*Number.MAX_VALUE,
+        z_max: -1*Number.MAX_VALUE,
     };
     for(let i = 0; i < vertices.length; i += 3) {
         bounds.x_min = Math.min(bounds.x_min, vertices[i+0]);
@@ -100,6 +100,7 @@ function loadModel(model) {
     }
 
     modelBounds = bounds;
+    console.log(modelBounds);
 }
 
 // return vertex data for the model
